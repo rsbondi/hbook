@@ -12,6 +12,7 @@ try {
   console.log(data)
   books = JSON.parse(data) 
 } catch (err) {
+  books = []
   console.error(err)
 }
 
