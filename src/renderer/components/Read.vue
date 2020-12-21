@@ -1,7 +1,8 @@
 <template>
   <div class="wrapper">
     <div class="top-menu">
-      <div @click="back">back</div>
+      <div @click="back">&lt;</div>
+      <div @click="next">&gt;</div>
       <div @click="library">library</div>
     </div>
     <webview v-if="currentBook != -1" :src="url" :preload="preload"></webview>
@@ -12,8 +13,12 @@
 export default {
   name: "read",
   methods: {
+    // TODO: scroll position for history
     back() {
       this.webview.goBack()
+    },
+    next() {
+      this.webview.goForward()
     },
     library() {
       this.$store.dispatch('set_current_book', -1)

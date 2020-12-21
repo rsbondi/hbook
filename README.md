@@ -8,8 +8,9 @@ hbook aims to provide a way to read online static html books with some of the fa
 * tracks last visited url
 * tracks scroll position
 
-## future features
+## todo
 
+* fix scrolling with navigation buttons
 * highlights
 * notes
 * collections?
