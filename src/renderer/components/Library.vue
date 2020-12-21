@@ -36,21 +36,36 @@ export default {
     },
     removeBook(index) {
       this.$electron.ipcRenderer.send("remove-book", index);
-    }
+    },
+    addEvent(event, handler) { 
+      console.log(event, handler)
+      this.$electron.ipcRenderer.on(event, handler)
+      this.listeners.push({
+        type: event,
+        listener: handler
+      })
+    },
+    sendLibrary(e, arg) {
+      this.$store.dispatch('set_books', arg.books)
+      this.$store.dispatch('set_preload', arg.preload)
+    },
+    sendLibraryEvent(e, arg) {
+      this.$store.dispatch('set_books', arg.books)
+      this.$store.dispatch('set_preload', arg.preload)
+    },
+    bookAddedEvent(e, arg) {
+      this.$store.dispatch('add_book', arg)
+    },
+    bookRemovedEvent(e, arg) {
+      this.$store.dispatch('remove_book', arg)
+    },
   },
   mounted() {
     this.$electron.ipcRenderer.send("get-library");
 
-    this.$electron.ipcRenderer.on("send-library", (e, arg) => {
-      this.$store.dispatch('set_books', arg.books)
-      this.$store.dispatch('set_preload', arg.preload)
-    });
-    this.$electron.ipcRenderer.on("book-added", (e, arg) => {
-      this.$store.dispatch('add_book', arg)
-    });
-    this.$electron.ipcRenderer.on("book-removed", (e, arg) => {
-      this.$store.dispatch('remove_book', arg)
-    });
+    this.addEvent("send-library", this.sendLibraryEvent)
+    this.addEvent("book-added", this.bookAddedEvent)
+    this.addEvent("book-removed", this.bookRemovedEvent)
   },
   computed: {
     books() {
@@ -64,8 +79,15 @@ export default {
     return {
       showBookForm: false,
       title: "",
-      url: ""
+      url: "",
+      listeners: []
     }
+  },
+  beforeDestroy() {
+    this.listeners.forEach(l => {
+      console.log('remove', l)
+      this.$electron.ipcRenderer.removeListener(l.type, l.listener)
+    })
   }
 }
 </script>
