@@ -38,7 +38,6 @@ export default {
       this.$electron.ipcRenderer.send("remove-book", index);
     },
     addEvent(event, handler) { 
-      console.log(event, handler)
       this.$electron.ipcRenderer.on(event, handler)
       this.listeners.push({
         type: event,
@@ -85,7 +84,6 @@ export default {
   },
   beforeDestroy() {
     this.listeners.forEach(l => {
-      console.log('remove', l)
       this.$electron.ipcRenderer.removeListener(l.type, l.listener)
     })
   }

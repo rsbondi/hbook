@@ -25,7 +25,6 @@ export default {
       this.$router.push('/')
     },
     addEvent(event, handler) {
-      console.log(event, handler)
       const listener = handler
       this.webview.addEventListener(event, listener)
       this.listeners.push({
@@ -34,7 +33,6 @@ export default {
       })
     },
     didNavigate(event) {
-      console.log('did-navigate', this.books[this.currentBook])
       this.$store.dispatch('update_book', {index: this.currentBook, key:'currentUrl', value: event.url})
       this.$store.dispatch('update_book', {index: this.currentBook, key:'currentY', value: 0})
 
@@ -86,7 +84,6 @@ export default {
   },
   beforeDestroy() {
     this.listeners.forEach(l => {
-      console.log('remove', l)
       this.webview.removeEventListener(l.type, l.listener)
     })
   }
