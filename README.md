@@ -1,22 +1,19 @@
-# online-reader
+# hbook
 
-> Read and keep track of online html docs
+hbook aims to provide a way to read online static html books with some of the familiar features of an ebook reader.  There are many good books deployed as static html, gitbook or even books developed on github.  They can be difficult to read in this format, you can easily loose track of where you left off.  hbook will keep track for you across multiple books.
 
-#### Build Setup
+## current features
 
-``` bash
-# install dependencies
-npm install
+* add books to your library
+* tracks last visited url
+* tracks scroll position
 
-# serve with hot reload at localhost:9080
-npm run dev
+## future features
 
-# build electron application for production
-npm run build
+* highlights
+* notes
+* collections?
 
+# limitations
 
-```
-
----
-
-This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[45a3e22](https://github.com/SimulatedGREG/electron-vue/tree/45a3e224e7bb8fc71909021ccfdcfec0f461f634) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
+* scroll position is dependent on app size so works best if you don't change from the default size.
