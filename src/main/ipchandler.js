@@ -45,6 +45,13 @@ ipc.on('add-book',  (event, args) => {
   saveBooks()
 })
 
+ipc.on('remove-book', (event, args) => {
+  books.splice(args, 1)
+  console.log('remove-book', books)
+  event.sender.send('book-removed', args)
+  saveBooks()
+})
+
 ipc.on('scroll',  (event, arg) => {
   books[currentBook].currentY = arg
   console.log('books', books)

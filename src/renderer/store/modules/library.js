@@ -19,6 +19,9 @@ const mutations = {
   },
   update_book (state, payload) {
     state.books[payload.index][state.key] = state.value
+  },
+  remove_book (state, payload) {
+    state.books.splice(payload, 1)
   }
 }
 
@@ -37,6 +40,9 @@ const actions = {
   },
   update_book ({ commit }, payload) {
     commit('update_book', payload)
+  },
+  remove_book ({ commit }, payload) {
+    commit('remove_book', payload)
   },
 }
 

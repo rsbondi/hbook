@@ -4,8 +4,11 @@
       <h2>Library</h2>
       <ul>
         <li v-for="(book,i) in books" :key="i">
-          <div class="book" @click="bookSelected(i)">
-            {{book.title}}
+          <div class="book">
+            <div class="title" @click="bookSelected(i)">
+              {{book.title}}
+            </div>
+            <button class="trash" @click="removeBook(i)">x</button>
           </div>
         </li>
       </ul>
@@ -30,8 +33,10 @@ export default {
     addBook() {
       if (this.title !== "" && this.url !== "")
         this.$electron.ipcRenderer.send("add-book", { title: this.title, url: this.url });      
+    },
+    removeBook(index) {
+      this.$electron.ipcRenderer.send("remove-book", index);
     }
-    
   },
   mounted() {
     this.$electron.ipcRenderer.send("get-library");
@@ -42,6 +47,9 @@ export default {
     });
     this.$electron.ipcRenderer.on("book-added", (e, arg) => {
       this.$store.dispatch('add_book', arg)
+    });
+    this.$electron.ipcRenderer.on("book-removed", (e, arg) => {
+      this.$store.dispatch('remove_book', arg)
     });
   },
   computed: {
@@ -67,6 +75,7 @@ export default {
     cursor: pointer;
     color: #28f;
     padding: 0.15em 0;
+    display: flex;
   }
 
   li {
@@ -114,5 +123,17 @@ export default {
     border-radius: 5px;
     box-sizing: content-box;
     padding: 0.5em 0.5em 3em 0.5em;
+  }
+
+  .title {
+    width: 352px;
+  }
+
+  .book button {
+    padding: 0.2em 0.4em;
+    background-color: white;
+    color: darkred;
+    border: 1px solid;
+    border-radius: 3px
   }
 </style>
