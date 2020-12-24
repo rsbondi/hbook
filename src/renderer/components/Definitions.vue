@@ -40,7 +40,7 @@ em {
 }
 .close {
   position: absolute;
-  right: 72px;
+  right: 8px;
   top: 6px;
   z-index: 42;
   background-color: antiquewhite;
@@ -54,6 +54,6 @@ em {
 }
 .content {
   max-height: 400px;
-  overflow: auto;    
+  overflow: auto;
 }
 </style>

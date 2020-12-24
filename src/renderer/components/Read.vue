@@ -148,5 +148,6 @@ export default {
     border: 1px solid lightgray;
     background-color: antiquewhite;
     width: 100%;
+    box-sizing: border-box;
   }
 </style>
