@@ -4,6 +4,7 @@
       <div @click="back">&lt;</div>
       <div @click="next">&gt;</div>
       <div @click="library">library</div>
+      <div class="lib-title">{{title}}</div>
     </div>
     <webview v-if="currentBook != -1" :src="url" :preload="preload"></webview>
   </div>
@@ -51,6 +52,7 @@ export default {
         setTimeout(() => {
           this.$electron.ipcRenderer.send('current-book', this.currentBook)
           this.url = this.books[this.currentBook].currentUrl
+          this.title = this.books[this.currentBook].title
           this.webview = document.querySelector('webview')
           this.webview.clearHistory()
   
@@ -69,6 +71,7 @@ export default {
     return {
       url: "about:blank",
       listeners: [],
+      title: "",
     };
   },
   computed: {
@@ -106,5 +109,11 @@ export default {
   .top-menu > div {
     padding: 0.2em 1em;
     cursor: pointer;
+  }
+  .lib-title {
+    position: absolute;
+    right: 0;
+    font-style: italic;
+    color: gray;
   }
 </style>
