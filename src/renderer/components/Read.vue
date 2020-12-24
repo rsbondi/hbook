@@ -6,13 +6,22 @@
       <div @click="library">library</div>
       <div class="lib-title">{{title}}</div>
     </div>
+    <div v-if="definitions" class="definitions">
+      <Definitions :word="word" :definitions="definitions" :close="() => definitions=null"/>
+    </div>
     <webview v-if="currentBook != -1" :src="url" :preload="preload"></webview>
   </div>
 </template>
 
 <script>
+import Dictionary from '../dictionary'
+import Definitions from './Definitions.vue';
+
+const dictionary = new Dictionary()
+
 export default {
   name: "read",
+  components: { Definitions },
   methods: {
     // TODO: scroll position for history
     back() {
@@ -55,6 +64,15 @@ export default {
           this.title = this.books[this.currentBook].title
           this.webview = document.querySelector('webview')
           this.webview.clearHistory()
+          this.addEvent('ipc-message', (e) => {
+            if (e.channel === 'word-selected') {
+              const word = e.args[0]
+              dictionary.getDefinitions(word).then(definitions => {
+                this.word = word
+                this.definitions = definitions
+              })
+            } else this.word = ""
+          })
   
           this.addEvent('did-navigate', this.didNavigate)
           this.addEvent('did-navigate-in-page', this.didNavigate)
@@ -72,6 +90,10 @@ export default {
       url: "about:blank",
       listeners: [],
       title: "",
+      lang: "en",
+      definitions: null,
+      word: "",
+
     };
   },
   computed: {
@@ -83,6 +105,9 @@ export default {
     },
     preload() {
       return this.$store.state.library.preload
+    },
+    dictionaryEndpoint() {
+      return `https://api.dictionaryapi.dev/api/v2/entries/${this.lang}/`
     }
   },
   beforeDestroy() {
@@ -115,5 +140,13 @@ export default {
     right: 0;
     font-style: italic;
     color: gray;
+  }
+
+  .definitions {
+    position: absolute;
+    padding: 2em;
+    border: 1px solid lightgray;
+    background-color: antiquewhite;
+    width: 100%;
   }
 </style>
