@@ -68,7 +68,7 @@ export default {
       this.word = ""
       if (e.channel === 'word-selected') {
         const word = e.args[0]
-        dictionary.getDefinitions(word).then(definitions => {
+        if (word) dictionary.getDefinitions(word).then(definitions => {
           this.word = word
           this.definitions = definitions
         })
