@@ -62,6 +62,24 @@ export default {
         value: event.url
       });
 
+    },
+    handleMessage(e) {
+      this.selection = ""
+      this.word = ""
+      if (e.channel === 'word-selected') {
+        const word = e.args[0]
+        dictionary.getDefinitions(word).then(definitions => {
+          this.word = word
+          this.definitions = definitions
+        })
+      } else if (e.channel === 'phrase-selected') {
+        this.selection = e.args[0]
+        console.log(this.selection)
+      } 
+    },
+    handleScroll(event) {
+      if(this.currentBook === -1) return
+      this.$electron.ipcRenderer.send('setscroll', this.books[this.currentBook].currentY)
     }
   },
   watch: {
@@ -74,27 +92,11 @@ export default {
           this.title = this.books[this.currentBook].title
           this.webview = document.querySelector('webview')
           this.webview.clearHistory()
-          this.addEvent('ipc-message', (e) => {
-            this.selection = ""
-            this.word = ""
-            if (e.channel === 'word-selected') {
-              const word = e.args[0]
-              dictionary.getDefinitions(word).then(definitions => {
-                this.word = word
-                this.definitions = definitions
-              })
-            } else if (e.channel === 'phrase-selected') {
-              this.selection = e.args[0]
-              console.log(this.selection)
-            } 
-          })
-  
+          
+          this.addEvent('ipc-message', this.handleMessage)  
           this.addEvent('did-navigate', this.didNavigate)
           this.addEvent('did-navigate-in-page', this.didNavigate)
-          this.addEvent('dom-ready', event => {
-            if(this.currentBook === -1) return
-            this.$electron.ipcRenderer.send('setscroll', this.books[this.currentBook].currentY)
-          })
+          this.addEvent('dom-ready', this.handleScroll)
 
         }, 200)  
       }
