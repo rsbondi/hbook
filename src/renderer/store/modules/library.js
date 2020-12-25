@@ -22,7 +22,12 @@ const mutations = {
   },
   remove_book (state, payload) {
     state.books.splice(payload, 1)
-  }
+  },
+  add_bookmark (state, payload) {
+    const book = state.books[state.currentBook]
+    book.bookmarks = book.bookmarks || []
+    book.bookmarks.push(payload)
+  },
 }
 
 const actions = {
@@ -44,6 +49,9 @@ const actions = {
   remove_book ({ commit }, payload) {
     commit('remove_book', payload)
   },
+  add_bookmark ({ commit }, payload) {
+    commit('add_bookmark', payload)
+  }
 }
 
 export default {

@@ -83,12 +83,14 @@ ipc.on('add-bookmark', (event, args) => {
   const book = books[args.index]
   book.bookmarks = book.bookmarks || []
   const { phrase, note } = args
-  book.bookmarks.push({
+  const bookmark = {
     phrase,
     note,
     url: book.currentUrl,
     scroll: book.currentY
-  })
+  }
+  book.bookmarks.push(bookmark)
+  event.sender.send('bookmark-added', bookmark)
   console.log('add-bookmark', book)
   saveBooks()
 })

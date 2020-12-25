@@ -26,19 +26,38 @@ export default {
   },
   data() {
     return {
-      note: ""
+      note: "",
+      listeners: []
     }
   },
   methods: {
+    addEvent(event, handler) { 
+      this.$electron.ipcRenderer.on(event, handler)
+      this.listeners.push({
+        type: event,
+        listener: handler
+      })
+    },
     addBookmark() {
       this.$electron.ipcRenderer.send('add-bookmark', { 
         phrase: this.phrase, 
         note: this.note ,
         index: this.$store.state.library.currentBook,
       })
+    },
+    bookmarkAddedEvent(e, arg) {
+      this.$store.dispatch('add_bookmark', arg)
       this.close()
     }
-  }
+  },
+  mounted() {
+    this.addEvent("bookmark-added", this.bookmarkAddedEvent)
+  },
+  beforeDestroy() {
+    this.listeners.forEach(l => {
+      this.$electron.ipcRenderer.removeListener(l.type, l.listener)
+    })
+  }    
 
 }
 </script>
