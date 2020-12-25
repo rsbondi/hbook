@@ -77,7 +77,21 @@ ipc.on('update-book', (event, args) => {
 ipc.on('current-book', (event, args) => {
   console.log('current-book', args)
   currentBook = args
-} )
+})
+
+ipc.on('add-bookmark', (event, args) => {
+  const book = books[args.index]
+  book.bookmarks = book.bookmarks || []
+  const { phrase, note } = args
+  book.bookmarks.push({
+    phrase,
+    note,
+    url: book.currentUrl,
+    scroll: book.currentY
+  })
+  console.log('add-bookmark', book)
+  saveBooks()
+})
 
 ipc.on('setscroll', (event, arg) => {
   if (webcontentIPC)

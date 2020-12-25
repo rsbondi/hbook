@@ -14,6 +14,8 @@ document.addEventListener('selectionchange', e => {
     const selection = e.target.getSelection().toString();
     if (selection.split(/\s/).length === 1)
       ipcRenderer.sendToHost('word-selected', selection)
+    if (selection.split(/\s/).length > 1)
+      ipcRenderer.sendToHost('phrase-selected', selection)
   }, 1000)
 })
 

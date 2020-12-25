@@ -4,10 +4,19 @@
       <div @click="back">&lt;</div>
       <div @click="next">&gt;</div>
       <div @click="library">library</div>
+      <div @click="showBookmark=!showBookmark">⭐</div>
       <div class="lib-title">{{title}}</div>
     </div>
     <div v-if="definitions" class="definitions">
       <Definitions :word="word" :definitions="definitions" :close="() => definitions=null"/>
+    </div>
+    <div v-if="showBookmark" class="bookmark">
+      <div v-if="selection!==''">
+        <Bookmark :phrase="selection" :close="() => showBookmark=false" />
+      </div>
+      <div v-else>
+        bookmark list here
+      </div>
     </div>
     <webview v-if="currentBook != -1" :src="url" :preload="preload"></webview>
   </div>
@@ -16,12 +25,13 @@
 <script>
 import Dictionary from '../dictionary'
 import Definitions from './Definitions.vue';
+import Bookmark from './Bookmark'
 
 const dictionary = new Dictionary()
 
 export default {
   name: "read",
-  components: { Definitions },
+  components: { Definitions, Bookmark },
   methods: {
     // TODO: scroll position for history
     back() {
@@ -65,13 +75,18 @@ export default {
           this.webview = document.querySelector('webview')
           this.webview.clearHistory()
           this.addEvent('ipc-message', (e) => {
+            this.selection = ""
+            this.word = ""
             if (e.channel === 'word-selected') {
               const word = e.args[0]
               dictionary.getDefinitions(word).then(definitions => {
                 this.word = word
                 this.definitions = definitions
               })
-            } else this.word = ""
+            } else if (e.channel === 'phrase-selected') {
+              this.selection = e.args[0]
+              console.log(this.selection)
+            } 
           })
   
           this.addEvent('did-navigate', this.didNavigate)
@@ -93,7 +108,8 @@ export default {
       lang: "en",
       definitions: null,
       word: "",
-
+      selection: "",
+      showBookmark: false,
     };
   },
   computed: {
@@ -142,7 +158,7 @@ export default {
     color: gray;
   }
 
-  .definitions {
+  .definitions, .bookmark {
     position: absolute;
     padding: 2em;
     border: 1px solid lightgray;
