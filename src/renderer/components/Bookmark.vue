@@ -19,25 +19,20 @@
 </template>
 
 <script>
+import EventMixin from '../eventMixin'
 export default {
   props: {
     phrase: String,
     close: Function,
   },
+  mixins: [ EventMixin ],
   data() {
     return {
       note: "",
-      listeners: []
     }
   },
   methods: {
-    addEvent(event, handler) { 
-      this.$electron.ipcRenderer.on(event, handler)
-      this.listeners.push({
-        type: event,
-        listener: handler
-      })
-    },
+
     addBookmark() {
       this.$electron.ipcRenderer.send('add-bookmark', { 
         phrase: this.phrase, 
@@ -53,12 +48,6 @@ export default {
   mounted() {
     this.addEvent("bookmark-added", this.bookmarkAddedEvent)
   },
-  beforeDestroy() {
-    this.listeners.forEach(l => {
-      this.$electron.ipcRenderer.removeListener(l.type, l.listener)
-    })
-  }    
-
 }
 </script>
 

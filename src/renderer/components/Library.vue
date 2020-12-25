@@ -23,8 +23,11 @@
 </template>
 
 <script>
+import EventMixin from '../eventMixin'
+
 export default {
   name: 'library',
+  mixins: [ EventMixin ],
   methods: {
     bookSelected(index) {
       this.$store.dispatch('set_current_book', index)
@@ -36,13 +39,6 @@ export default {
     },
     removeBook(index) {
       this.$electron.ipcRenderer.send("remove-book", index);
-    },
-    addEvent(event, handler) { 
-      this.$electron.ipcRenderer.on(event, handler)
-      this.listeners.push({
-        type: event,
-        listener: handler
-      })
     },
     sendLibrary(e, arg) {
       this.$store.dispatch('set_books', arg.books)
@@ -79,14 +75,8 @@ export default {
       showBookForm: false,
       title: "",
       url: "",
-      listeners: []
     }
   },
-  beforeDestroy() {
-    this.listeners.forEach(l => {
-      this.$electron.ipcRenderer.removeListener(l.type, l.listener)
-    })
-  }
 }
 </script>
 
