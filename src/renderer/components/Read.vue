@@ -15,7 +15,7 @@
         <Bookmark :phrase="selection" :close="() => showBookmark=false" />
       </div>
       <div v-else>
-        bookmark list here
+        <Bookmarks  :close="() => showBookmark=false" />
       </div>
     </div>
     <webview v-if="currentBook != -1" :src="url" :preload="preload"></webview>
@@ -26,12 +26,13 @@
 import Dictionary from '../dictionary'
 import Definitions from './Definitions.vue';
 import Bookmark from './Bookmark'
+import Bookmarks from './Bookmarks.vue';
 
 const dictionary = new Dictionary()
 
 export default {
   name: "read",
-  components: { Definitions, Bookmark },
+  components: { Definitions, Bookmark, Bookmarks, Bookmarks },
   methods: {
     // TODO: scroll position for history
     back() {
