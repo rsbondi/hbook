@@ -1,16 +1,21 @@
 <template>
 <div class="content">
-    <h3>Bookmark</h3>
+    <h3>Bookmarks</h3>
     <div class="close" @click="close">
       x
     </div>
+    <div v-if="!bookmarks || !bookmarks.length" class="no-bm">No bookmarks, please select text and open again to add.</div>
   <ul>
     <li v-for="(bm, index) in bookmarks" :key="index">
       <div @click="navToBookmark(index)" class="bookmark-content">
-        <h5>text</h5>
-        <div v-if="bm.phrase!==''">{{bm.phrase}}</div>
-        <h5>note</h5>
-        <div v-if="bm.note!==''">{{bm.note}}</div>
+        <div v-if="bm.phrase!==''">
+          <h5>text</h5>
+          <div>{{bm.phrase}}</div>
+        </div>
+        <div v-if="bm.note!==''">
+          <h5>note</h5>
+          <div>{{bm.note}}</div>
+        </div>
       </div>
     </li>
   </ul>
@@ -62,5 +67,8 @@ li {
 }
 .bookmark-content {
   cursor: pointer;
+}
+.no-bm{
+  font-style: italic;
 }
 </style>
