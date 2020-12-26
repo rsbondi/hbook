@@ -6,13 +6,12 @@ hbook aims to provide a way to read online static html books with some of the fa
 
 * add books to your library
 * tracks last visited url
-* tracks scroll position
+* tracks scroll position for last url
+* bookmarks with selected phrase and personal notes
 
 ## todo
 
-* fix scrolling with navigation buttons
-* highlights
-* notes
+* fix navigation button actions and scrolling
 * collections?
 
 # limitations
