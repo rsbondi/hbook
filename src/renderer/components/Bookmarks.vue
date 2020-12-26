@@ -5,7 +5,6 @@
       x
     </div>
   <ul>
-    <!-- note, phrase, url, scroll -->
     <li v-for="(bm, index) in bookmarks" :key="index">
       <div @click="navToBookmark(index)" class="bookmark-content">
         <h5>text</h5>
@@ -22,6 +21,7 @@
 export default {
   props: {
     close: Function,
+    nav: Function,
   },  computed: {
     bookmarks() {
       return this.$store.state.library.books[this.$store.state.library.currentBook].bookmarks || []
@@ -30,7 +30,7 @@ export default {
   methods: {
     navToBookmark(index) {
       const bookmark = this.bookmarks[index]
-      console.log(bookmark.url, bookmark.scroll)
+      this.nav(bookmark.url, bookmark.scroll)
     }
   }
 }

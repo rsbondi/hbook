@@ -15,7 +15,7 @@
         <Bookmark :phrase="selection" :close="() => showBookmark=false" />
       </div>
       <div v-else>
-        <Bookmarks  :close="() => showBookmark=false" />
+        <Bookmarks :nav="goBookmark" :close="() => showBookmark=false" />
       </div>
     </div>
     <webview v-if="currentBook != -1" :src="url" :preload="preload"></webview>
@@ -62,7 +62,7 @@ export default {
         key: 'currentUrl', 
         value: event.url
       });
-
+      this.url = event.url
     },
     handleMessage(e) {
       this.selection = ""
@@ -81,6 +81,14 @@ export default {
     handleScroll(event) {
       if(this.currentBook === -1) return
       this.$electron.ipcRenderer.send('setscroll', this.books[this.currentBook].currentY)
+    },
+    goBookmark(url, scroll) {
+      this.url = "about:blank"
+      this.$store.dispatch('set_scroll', scroll)
+      setTimeout(() => {
+        this.url = url
+        this.showBookmark = false
+      }, 0)
     }
   },
   watch: {

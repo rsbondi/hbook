@@ -27,6 +27,10 @@ const mutations = {
     const book = state.books[state.currentBook]
     book.bookmarks = book.bookmarks || []
     book.bookmarks.push(payload)
+  },  
+  set_scroll (state, payload) {
+    const book = state.books[state.currentBook]
+    book.currentY = payload
   },
 }
 
@@ -51,6 +55,9 @@ const actions = {
   },
   add_bookmark ({ commit }, payload) {
     commit('add_bookmark', payload)
+  },
+  set_scroll ({ commit }, payload) {
+    commit('set_scroll', payload)
   }
 }
 
