@@ -63,8 +63,15 @@ const actions = {
   }
 }
 
+const getters = {
+  book: state => {
+    return state.books[state.currentBook]
+  }
+}
+
 export default {
   state,
   mutations,
-  actions
+  actions,
+  getters
 }

@@ -27,9 +27,10 @@ export default {
   props: {
     close: Function,
     nav: Function,
-  },  computed: {
+  },  
+  computed: {
     bookmarks() {
-      return this.$store.state.library.books[this.$store.state.library.currentBook].bookmarks || []
+      return this.$store.getters.book.bookmarks || []
     }
   },
   methods: {
