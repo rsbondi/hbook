@@ -1,12 +1,14 @@
 const state = {
   currentBook: -1,
   books: [],
+  settings: {},
   preload: ""
 }
 
 const mutations = {
   set_books (state, payload) {
-    state.books = payload
+    state.books = payload.books,
+    state.settings = payload.settings
   },
   set_current_book (state, payload) {
     state.currentBook = payload

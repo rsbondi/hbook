@@ -1,8 +1,8 @@
 export default class Dictionary {
 
-  constructor() {
+  constructor(settings) {
     this.endpoint = "https://api.dictionaryapi.dev/api/v2/entries"
-    this.lang = "en"
+    this.lang = settings.lang
   }
 
   getDefinitions(word, language) {

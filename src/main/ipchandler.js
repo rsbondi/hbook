@@ -5,12 +5,18 @@ const fs = require('fs')
 let browserIPC, webcontentIPC
 
 const configFilename = path.join(os.homedir(), '.hbook')
-let books
+let books, settings
 
 try {
   const data = fs.readFileSync(configFilename, 'utf8')
-  console.log(data)
-  books = JSON.parse(data) 
+  const info = JSON.parse(data)
+  if (info.library) {
+    books = info.library
+    settings = info.settings
+  } else {
+    books = info
+    settings = { lang: 'en' }
+  }
 } catch (err) {
   books = []
   console.error(err)
@@ -20,7 +26,7 @@ console.log('books initialized', books)
 
 function saveBooks() {
   try {
-    fs.writeFile(configFilename, JSON.stringify(books), err => {
+    fs.writeFile(configFilename, JSON.stringify({ library: books, settings }), err => {
       if (err) {
         console.log(err);
       }
@@ -61,7 +67,8 @@ ipc.on('scroll',  (event, arg) => {
 ipc.on('get-library', (event, arg) => {
   browserIPC = event.sender
   event.sender.send('send-library', {
-    books:books,
+    books,
+    settings,
     preload: 'file://'+path.resolve(path.join(__dirname, 'preload.js'))
   })
 })

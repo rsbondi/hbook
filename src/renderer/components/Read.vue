@@ -28,7 +28,7 @@ import Definitions from './Definitions.vue';
 import Bookmark from './Bookmark'
 import Bookmarks from './Bookmarks.vue';
 
-const dictionary = new Dictionary()
+let dictionary
 
 export default {
   name: "read",
@@ -141,6 +141,9 @@ export default {
     this.listeners.forEach(l => {
       this.webview.removeEventListener(l.type, l.listener)
     })
+  },
+  mounted() {
+    dictionary = new Dictionary(this.$store.state.library.settings)
   }
 };
 </script>

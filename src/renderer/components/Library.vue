@@ -41,11 +41,11 @@ export default {
       this.$electron.ipcRenderer.send("remove-book", index);
     },
     sendLibrary(e, arg) {
-      this.$store.dispatch('set_books', arg.books)
+      this.$store.dispatch('set_books', { books: arg.books, settings: arg.settings })
       this.$store.dispatch('set_preload', arg.preload)
     },
     sendLibraryEvent(e, arg) {
-      this.$store.dispatch('set_books', arg.books)
+      this.$store.dispatch('set_books', { books: arg.books, settings: arg.settings })
       this.$store.dispatch('set_preload', arg.preload)
     },
     bookAddedEvent(e, arg) {
