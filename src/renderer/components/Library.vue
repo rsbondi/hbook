@@ -1,22 +1,31 @@
 <template>
-  <div class="library">
-    <div class="lib-wrapper">
-      <h2>Library</h2>
-      <ul>
-        <li v-for="(book,i) in books" :key="i">
-          <div class="book">
-            <div class="title" @click="bookSelected(i)">
-              {{book.title}}
+  <div>
+    <div class="top-menu">
+      <div @click="toggleSettings">⚙</div>
+    </div>
+    <div v-if="showSettings">
+      <Settings mode="global"  :close="() => showSettings=false"/>
+    </div>
+    <div class="library">
+
+      <div class="lib-wrapper">
+        <h2>Library</h2>
+        <ul>
+          <li v-for="(book,i) in books" :key="i">
+            <div class="book">
+              <div class="title" @click="bookSelected(i)">
+                {{book.title}}
+              </div>
+              <button class="trash" @click="removeBook(i)">x</button>
             </div>
-            <button class="trash" @click="removeBook(i)">x</button>
-          </div>
-        </li>
-      </ul>
-      <button @click="showBookForm=!showBookForm">+</button>
-      <div class="book-form" v-if="showBookForm">
-        <input v-model="title" type="text" placeholder="title">
-        <input v-model="url" type="text" placeholder="url">
-        <button @click="addBook">Add Book</button>
+          </li>
+        </ul>
+        <button @click="showBookForm=!showBookForm">+</button>
+        <div class="book-form" v-if="showBookForm">
+          <input v-model="title" type="text" placeholder="title">
+          <input v-model="url" type="text" placeholder="url">
+          <button @click="addBook">Add Book</button>
+        </div>
       </div>
     </div>
   </div>
@@ -24,10 +33,12 @@
 
 <script>
 import EventMixin from '../eventMixin'
+import Settings from './Settings.vue'
 
 export default {
   name: 'library',
   mixins: [ EventMixin ],
+  components: { Settings },
   methods: {
     bookSelected(index) {
       this.$store.dispatch('set_current_book', index)
@@ -54,6 +65,9 @@ export default {
     bookRemovedEvent(e, arg) {
       this.$store.dispatch('remove_book', arg)
     },
+    toggleSettings() {
+      this.showSettings = !this.showSettings
+    }
   },
   mounted() {
     this.$electron.ipcRenderer.send("get-library");
@@ -75,6 +89,7 @@ export default {
       showBookForm: false,
       title: "",
       url: "",
+      showSettings: false,
     }
   },
 }

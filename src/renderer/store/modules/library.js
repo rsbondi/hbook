@@ -34,6 +34,13 @@ const mutations = {
     const book = state.books[state.currentBook]
     book.currentY = payload
   },
+  set_setting_lang (state, payload) {
+    if (payload.mode === 'global') {
+      state.settings.lang = payload.lang
+    } else {
+      state.book[state.currentBook].lang = payload.lang
+    }
+  }
 }
 
 const actions = {
@@ -60,6 +67,9 @@ const actions = {
   },
   set_scroll ({ commit }, payload) {
     commit('set_scroll', payload)
+  },
+  set_setting_lang ({ commit }, payload) {
+    commit('set_setting_lang', payload)
   }
 }
 

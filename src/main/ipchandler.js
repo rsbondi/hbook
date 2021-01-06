@@ -110,3 +110,14 @@ ipc.on('setscroll', (event, arg) => {
 ipc.on('webview-loaded', (event, arg) => {
   webcontentIPC = event.sender
 })
+
+ipc.on('save-lang', (event, arg) => {
+  if (arg.mode === 'global') {
+    settings.lang = arg.lang
+    console.log('saved language', settings)
+  } else {
+    books[currentBook].lang = arg.lang
+    console.log('saved language', books)
+  }
+  saveBooks()
+})

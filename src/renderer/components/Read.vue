@@ -172,12 +172,4 @@ export default {
     color: gray;
   }
 
-  .definitions, .bookmark {
-    position: absolute;
-    padding: 2em;
-    border: 1px solid lightgray;
-    background-color: antiquewhite;
-    width: 100%;
-    box-sizing: border-box;
-  }
 </style>
