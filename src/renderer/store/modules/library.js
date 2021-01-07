@@ -38,7 +38,7 @@ const mutations = {
     if (payload.mode === 'global') {
       state.settings.lang = payload.lang
     } else {
-      state.book[state.currentBook].lang = payload.lang
+      state.books[state.currentBook].lang = payload.lang
     }
   }
 }

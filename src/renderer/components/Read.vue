@@ -5,10 +5,14 @@
       <div @click="next">&gt;</div>
       <div @click="library">library</div>
       <div @click="showBookmark=!showBookmark">⭐</div>
+      <div @click="toggleSettings">⚙</div>
       <div class="lib-title">{{title}}</div>
     </div>
     <div v-if="definitions" class="definitions">
       <Definitions :word="word" :definitions="definitions" :close="() => definitions=null"/>
+    </div>
+    <div v-if="showSettings">
+      <Settings :close="() => showSettings=false"/>
     </div>
     <div v-if="showBookmark" class="bookmark">
       <div v-if="selection!==''">
@@ -27,12 +31,13 @@ import Dictionary from '../dictionary'
 import Definitions from './Definitions.vue';
 import Bookmark from './Bookmark'
 import Bookmarks from './Bookmarks.vue';
+import Settings from './Settings.vue'
 
 let dictionary
 
 export default {
   name: "read",
-  components: { Definitions, Bookmark, Bookmarks, Bookmarks },
+  components: { Definitions, Bookmark, Bookmarks, Bookmarks, Settings },
   methods: {
     // TODO: scroll position for history
     back() {
@@ -69,7 +74,8 @@ export default {
       this.word = ""
       if (e.channel === 'word-selected') {
         const word = e.args[0]
-        if (word) dictionary.getDefinitions(word).then(definitions => {
+        const lang = this.$store.getters.book.lang || this.$store.state.library.settings.lang
+        if (word) dictionary.getDefinitions(word, lang).then(definitions => {
           this.word = word
           this.definitions = definitions
         })
@@ -89,6 +95,9 @@ export default {
         this.url = url
         this.showBookmark = false
       }, 0)
+    },
+    toggleSettings() {
+      this.showSettings = ! this.showSettings
     }
   },
   watch: {
@@ -121,6 +130,7 @@ export default {
       word: "",
       selection: "",
       showBookmark: false,
+      showSettings: false,
     };
   },
   computed: {
