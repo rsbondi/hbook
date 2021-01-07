@@ -8,6 +8,9 @@ hbook aims to provide a way to read online static html books with some of the fa
 * tracks last visited url
 * tracks scroll position for last url
 * bookmarks with selected phrase and personal notes
+* dictionary lookup of words
+* set default language for dictionary
+* set langauge at the book level for dictionary
 
 ## todo
 
