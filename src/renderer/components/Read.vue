@@ -81,7 +81,7 @@ export default {
         })
       } else if (e.channel === 'phrase-selected') {
         this.selection = e.args[0]
-        console.log(this.selection)
+        this.showBookmark = true
       } 
     },
     handleScroll(event) {
