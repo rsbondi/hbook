@@ -1,11 +1,13 @@
 <template>
   <div class="wrapper">
     <div class="top-menu">
+      <div @click="home" title="home">⌂</div>
+      <div @click="furthest" title="go to furthest read">⏩</div>
       <div @click="back">&lt;</div>
       <div @click="next">&gt;</div>
       <div @click="library">library</div>
-      <div @click="showBookmark=!showBookmark">⭐</div>
-      <div @click="toggleSettings">⚙</div>
+      <div @click="showBookmark=!showBookmark" title="bookmarks">⭐</div>
+      <div @click="toggleSettings" title="settings">⚙</div>
       <div class="lib-title">{{title}}</div>
     </div>
     <div v-if="definitions" class="definitions">
@@ -98,8 +100,6 @@ export default {
     handleScroll(event) {
       if(this.currentBook === -1) return
       const book = this.books[this.currentBook]
-      // const index = book.urls.map(item => item.url).indexOf(this.url)
-      this.$store.dispatch('update_book', {index: this.currentBook, key:'urlindex', value: book.urlindex})
       this.$electron.ipcRenderer.send('setscroll', book.urls[book.urlindex].scroll)
     },
     goBookmark(url, scroll) {
@@ -111,6 +111,14 @@ export default {
         this.url = url
         this.showBookmark = false
       }, 0)
+    },
+    home() {
+      const book = this.books[this.currentBook]
+      this.url = book.urls[0].url
+    },
+    furthest() {
+      const book = this.books[this.currentBook]
+      this.url = book.urls[book.urls.length - 1].url
     },
     toggleSettings() {
       this.showSettings = ! this.showSettings
