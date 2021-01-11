@@ -46,7 +46,9 @@ export default {
     },
     addBook() {
       if (this.title !== "" && this.url !== "")
-        this.$electron.ipcRenderer.send("add-book", { title: this.title, url: this.url });      
+        this.$electron.ipcRenderer.send("add-book", { title: this.title, url: this.url });  
+        this.title = ""
+        this.url = ""    
     },
     removeBook(index) {
       this.$electron.ipcRenderer.send("remove-book", index);
