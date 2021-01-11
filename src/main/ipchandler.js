@@ -41,10 +41,13 @@ let currentBook = 0
 ipc.on('add-book',  (event, args) => {
   const book = {
     title: args.title,
-    baseUrl: args.url,
-    currentUrl: args.url,
-    currentY: 0,
-    highlights: []
+    urls: [
+      {
+        url: args.url,
+        scroll: 0
+      }
+    ],
+    urlindex: 0
   }
   books.push(book)
   event.sender.send('book-added', book)
@@ -59,8 +62,11 @@ ipc.on('remove-book', (event, args) => {
 })
 
 ipc.on('scroll',  (event, arg) => {
-  books[currentBook].currentY = arg
+  const book = books[currentBook]
+  book.urls[book.urlindex].scroll = arg
   console.log('books', books)
+  console.log('scroll', arg, book.urls, book.urlindex)
+  browserIPC.send('scroll', arg)
   saveBooks()
 })
 
@@ -75,9 +81,30 @@ ipc.on('get-library', (event, arg) => {
 
 ipc.on('update-book', (event, args) => {
   currentBook = args.index
-  books[args.index][args.key] = args.value
-  books[args.index].currentY = 0
+  const book = books[args.index]
+  if (args.key === 'url') {
+    const book = books[currentBook]
+    let index = book.urls.map(item => item.url).indexOf(args.value.url)
+    if (index === -1) {
+      book.urls.push({url: args.value.url, scroll: args.value.scroll})
+      index = book.urls.length - 1
+      book.urlindex = index
+    }
+    let url = book.urls[index]
+    url = {
+      url: args.value.url || url.url, 
+      scroll: args.value.scroll !== null ? args.value.scroll : url.scroll}
+  } else {
+    books[args.index][args.key] = args.value
+  }
+
   console.log('update-book', books, currentBook)
+  saveBooks()
+})
+
+ipc.on('update-book-url-index', (event, args) => {
+  console.log('index update', args)
+  books[currentBook].urlindex = args
   saveBooks()
 })
 
@@ -90,11 +117,11 @@ ipc.on('add-bookmark', (event, args) => {
   const book = books[args.index]
   book.bookmarks = book.bookmarks || []
   const { phrase, note } = args
+  const urlIndex = book.urls.indexOf(book.urls[book.urlindex])
   const bookmark = {
     phrase,
     note,
-    url: book.currentUrl,
-    scroll: book.currentY
+    url: book.urls[urlindex],
   }
   book.bookmarks.push(bookmark)
   event.sender.send('bookmark-added', bookmark)
@@ -103,6 +130,7 @@ ipc.on('add-bookmark', (event, args) => {
 })
 
 ipc.on('setscroll', (event, arg) => {
+  console.log('setscroll', arg)
   if (webcontentIPC)
     webcontentIPC.send('setscroll', arg)
 })

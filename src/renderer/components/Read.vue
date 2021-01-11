@@ -32,12 +32,14 @@ import Definitions from './Definitions.vue';
 import Bookmark from './Bookmark'
 import Bookmarks from './Bookmarks.vue';
 import Settings from './Settings.vue'
+import EventMixin from '../eventMixin'
 
 let dictionary
 
 export default {
   name: "read",
   components: { Definitions, Bookmark, Bookmarks, Bookmarks, Settings },
+  mixins: [EventMixin],
   methods: {
     // TODO: scroll position for history
     back() {
@@ -50,24 +52,33 @@ export default {
       this.$store.dispatch('set_current_book', -1)
       this.$router.push('/')
     },
-    addEvent(event, handler) {
+    addWebviewEvent(event, handler) {
       const listener = handler
       this.webview.addEventListener(event, listener)
-      this.listeners.push({
+      this.wvlisteners.push({
         type: event,
         listener: listener
       })
     },
     didNavigate(event) {
-      this.$store.dispatch('update_book', {index: this.currentBook, key:'currentUrl', value: event.url})
-      this.$store.dispatch('update_book', {index: this.currentBook, key:'currentY', value: 0})
+      const book = this.books[this.currentBook]
+      const urlindex = book.urls.map(item => item.url).indexOf(event.url)
+      let scroll = 0
+      if (urlindex > -1) {
+        scroll = book.urls[urlindex].scroll
+      }
+      const payload = {index: this.currentBook, key:'url', value: {
+        url: event.url,
+        scroll
+      }}
+      this.$store.dispatch('update_book', payload)
+      this.$store.dispatch('update_book_url_index', urlindex)
 
-      this.$electron.ipcRenderer.send("update-book", {
-        index: this.currentBook, 
-        key: 'currentUrl', 
-        value: event.url
-      });
+      this.$electron.ipcRenderer.send("update-book", payload);
+      this.$electron.ipcRenderer.send("update-book-url-index", urlindex);
       this.url = event.url
+      this.$store.dispatch('set_scroll', scroll)
+
     },
     handleMessage(e) {
       this.selection = ""
@@ -86,18 +97,26 @@ export default {
     },
     handleScroll(event) {
       if(this.currentBook === -1) return
-      this.$electron.ipcRenderer.send('setscroll', this.books[this.currentBook].currentY)
+      const book = this.books[this.currentBook]
+      // const index = book.urls.map(item => item.url).indexOf(this.url)
+      this.$store.dispatch('update_book', {index: this.currentBook, key:'urlindex', value: book.urlindex})
+      this.$electron.ipcRenderer.send('setscroll', book.urls[book.urlindex].scroll)
     },
     goBookmark(url, scroll) {
-      this.url = "about:blank"
-      this.$store.dispatch('set_scroll', scroll)
+      const book = this.books[this.currentBook]
+      const urlindex = book.urls.map(item => item.url).indexOf(url)
+      this.$store.dispatch('update_book', {index: this.currentBook, key:'urlindex', value: urlindex})
       setTimeout(() => {
+        this.$store.dispatch('set_scroll', scroll)
         this.url = url
         this.showBookmark = false
       }, 0)
     },
     toggleSettings() {
       this.showSettings = ! this.showSettings
+    }, 
+    updateScroll(event, scroll) {
+      this.$store.dispatch('set_scroll', scroll)
     }
   },
   watch: {
@@ -106,15 +125,17 @@ export default {
         
         setTimeout(() => {
           this.$electron.ipcRenderer.send('current-book', this.currentBook)
-          this.url = this.books[this.currentBook].currentUrl
-          this.title = this.books[this.currentBook].title
+          const book = this.books[this.currentBook]
+          this.url = book.urls[book.urlindex].url
+          this.title = book.title
           this.webview = document.querySelector('webview')
           this.webview.clearHistory()
           
-          this.addEvent('ipc-message', this.handleMessage)  
-          this.addEvent('did-navigate', this.didNavigate)
-          this.addEvent('did-navigate-in-page', this.didNavigate)
-          this.addEvent('dom-ready', this.handleScroll)
+          this.addWebviewEvent('ipc-message', this.handleMessage)  
+          this.addWebviewEvent('did-navigate', this.didNavigate)
+          this.addWebviewEvent('did-navigate-in-page', this.didNavigate)
+          this.addWebviewEvent('dom-ready', this.handleScroll)
+          this.addEvent('scroll', this.updateScroll)
 
         }, 200)  
       }
@@ -123,7 +144,7 @@ export default {
   data() {
     return {
       url: "about:blank",
-      listeners: [],
+      wvlisteners: [],
       title: "",
       lang: "en",
       definitions: null,
@@ -148,7 +169,7 @@ export default {
     }
   },
   beforeDestroy() {
-    this.listeners.forEach(l => {
+    this.wvlisteners.forEach(l => {
       this.webview.removeEventListener(l.type, l.listener)
     })
   },
