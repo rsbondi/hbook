@@ -49,10 +49,14 @@ const mutations = {
     book.bookmarks.push(payload)
   },  
   set_scroll (state, payload) {
-    const newBooks = [...state.books]
-    const book = newBooks[state.currentBook]
-    newBooks[state.currentBook].urls[book.urlindex].scroll = payload
-    state.books = newBooks
+    try {
+      const newBooks = [...state.books]
+      const book = newBooks[state.currentBook]
+      newBooks[state.currentBook].urls[book.urlindex].scroll = payload
+      state.books = newBooks
+    } catch (e) {
+      // TODO: why is the index out of sync here on new url?
+    }
   },
   set_setting_lang (state, payload) {
     if (payload.mode === 'global') {
