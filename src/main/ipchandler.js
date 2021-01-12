@@ -75,7 +75,7 @@ ipc.on('get-library', (event, arg) => {
   event.sender.send('send-library', {
     books,
     settings,
-    preload: 'file://'+path.resolve(path.join(__dirname, 'preload.js'))
+    preload: 'file://'+path.resolve(path.join(__static, 'preload.js'))
   })
 })
 
