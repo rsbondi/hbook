@@ -51,12 +51,13 @@ ipc.on('add-book',  (event, args) => {
   }
   books.push(book)
   event.sender.send('book-added', book)
+  console.log('add-book', args)
   saveBooks()
 })
 
 ipc.on('remove-book', (event, args) => {
   books.splice(args, 1)
-  console.log('remove-book', books)
+  console.log('remove-book', args)
   event.sender.send('book-removed', args)
   saveBooks()
 })
@@ -64,7 +65,6 @@ ipc.on('remove-book', (event, args) => {
 ipc.on('scroll',  (event, arg) => {
   const book = books[currentBook]
   book.urls[book.urlindex].scroll = arg
-  console.log('books', books)
   console.log('scroll', arg, book.urls, book.urlindex)
   browserIPC.send('scroll', arg)
   saveBooks()
@@ -98,7 +98,7 @@ ipc.on('update-book', (event, args) => {
     books[args.index][args.key] = args.value
   }
 
-  console.log('update-book', books, currentBook)
+  console.log('update-book', book, currentBook)
   saveBooks()
 })
 
@@ -125,7 +125,6 @@ ipc.on('add-bookmark', (event, args) => {
     url,
     scroll
   }
-  console.log('adding fucking bookmark', bookmark)
   book.bookmarks.push(bookmark)
   event.sender.send('bookmark-added', bookmark)
   console.log('add-bookmark', book)
@@ -147,8 +146,9 @@ ipc.on('save-lang', (event, arg) => {
     settings.lang = arg.lang
     console.log('saved language', settings)
   } else {
-    books[currentBook].lang = arg.lang
-    console.log('saved language', books)
+    const book = books[currentBook]
+    book.lang = arg.lang
+    console.log('saved language', book)
   }
   saveBooks()
 })
