@@ -182,6 +182,13 @@ export default {
     })
   },
   mounted() {
+    const book = this.books[this.currentBook]
+    if (!book) return
+    this.url = book.urls[book.urlindex].url
+    this.title = book.title
+    setTimeout(() => {
+      this.handleScroll()
+    },200)
     dictionary = new Dictionary(this.$store.state.library.settings)
   }
 };
