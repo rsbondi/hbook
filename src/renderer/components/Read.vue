@@ -98,10 +98,11 @@ export default {
         this.showBookmark = true
       } 
     },
-    handleScroll(event) {
+    handleScroll(event, max) {
       if(this.currentBook === -1) return
       const book = this.books[this.currentBook]
-      this.$electron.ipcRenderer.send('setscroll', book.urls[book.urlindex].scroll)
+      const url =  book.urls[book.urlindex]
+      this.$electron.ipcRenderer.send('setscroll', max ? url.maxscroll : url.scroll)
     },
     goBookmark(url, scroll) {
       const book = this.books[this.currentBook]
@@ -124,6 +125,9 @@ export default {
     furthest() {
       const book = this.books[this.currentBook]
       this.url = book.urls[book.urls.length - 1].url
+      setTimeout(() => {
+        this.handleScroll(null, true)
+      }, 200)
     },
     toggleSettings() {
       this.showSettings = ! this.showSettings

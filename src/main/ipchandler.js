@@ -64,7 +64,9 @@ ipc.on('remove-book', (event, args) => {
 
 ipc.on('scroll',  (event, arg) => {
   const book = books[currentBook]
-  book.urls[book.urlindex].scroll = arg
+  const url = book.urls[book.urlindex]
+  url.scroll = arg
+  url.maxscroll = Math.max(url.maxscroll, arg)
   console.log('scroll', arg, book.urls, book.urlindex)
   browserIPC.send('scroll', arg)
   saveBooks()

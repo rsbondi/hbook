@@ -52,7 +52,9 @@ const mutations = {
     try {
       const newBooks = [...state.books]
       const book = newBooks[state.currentBook]
-      newBooks[state.currentBook].urls[book.urlindex].scroll = payload
+      const url = newBooks[state.currentBook].urls[book.urlindex]
+      url.scroll = payload
+      url.maxscroll = Math.max(url.maxscroll || 0, payload)
       state.books = newBooks
     } catch (e) {
       // TODO: why is the index out of sync here on new url?
