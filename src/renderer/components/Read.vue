@@ -115,7 +115,7 @@ export default {
           this.handleScroll()
         }
         this.showBookmark = false
-      }, 0)
+      }, 200)
     },
     home() {
       const book = this.books[this.currentBook]
@@ -129,21 +129,26 @@ export default {
       this.showSettings = ! this.showSettings
     }, 
     updateScroll(event, scroll) {
-      // this.$store.dispatch('set_scroll', scroll)
+      this.$store.dispatch('set_scroll', scroll)
     },
     bootstrap() {
       this.$electron.ipcRenderer.send('current-book', this.currentBook)
       const book = this.books[this.currentBook]
+      if (!book) return
       this.url = book.urls[book.urlindex].url
       this.title = book.title
       this.webview = document.querySelector('webview')
-      this.webview.clearHistory()
       
       this.addWebviewEvent('ipc-message', this.handleMessage)  
       this.addWebviewEvent('did-navigate', this.didNavigate)
       this.addWebviewEvent('did-navigate-in-page', this.didNavigate)
       this.addWebviewEvent('dom-ready', this.handleScroll)
-
+      const oneTimeDOM = () => {
+        this.webview.clearHistory()
+        this.webview.removeEventListener('dom-ready', oneTimeDOM)
+      }
+      this.addWebviewEvent('dom-ready', oneTimeDOM)
+      this.addEvent('scroll', this.updateScroll)
     }
   },
   watch: {
