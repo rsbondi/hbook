@@ -63,6 +63,7 @@ export default {
       })
     },
     didNavigate(event) {
+      if (event.url === "about:blank") return
       const book = this.books[this.currentBook]
       const urlindex = book.urls.map(item => item.url).indexOf(event.url)
       let scroll = 0
@@ -106,9 +107,13 @@ export default {
       const book = this.books[this.currentBook]
       const urlindex = book.urls.map(item => item.url).indexOf(url)
       this.$store.dispatch('update_book', {index: this.currentBook, key:'urlindex', value: urlindex})
+      const thisDotUrl = this.url
+      this.url = url
+      this.$store.dispatch('set_scroll', scroll)
       setTimeout(() => {
-        this.$store.dispatch('set_scroll', scroll)
-        this.url = url
+        if (url === thisDotUrl) {
+          this.handleScroll()
+        }
         this.showBookmark = false
       }, 0)
     },
@@ -124,7 +129,21 @@ export default {
       this.showSettings = ! this.showSettings
     }, 
     updateScroll(event, scroll) {
-      this.$store.dispatch('set_scroll', scroll)
+      // this.$store.dispatch('set_scroll', scroll)
+    },
+    bootstrap() {
+      this.$electron.ipcRenderer.send('current-book', this.currentBook)
+      const book = this.books[this.currentBook]
+      this.url = book.urls[book.urlindex].url
+      this.title = book.title
+      this.webview = document.querySelector('webview')
+      this.webview.clearHistory()
+      
+      this.addWebviewEvent('ipc-message', this.handleMessage)  
+      this.addWebviewEvent('did-navigate', this.didNavigate)
+      this.addWebviewEvent('did-navigate-in-page', this.didNavigate)
+      this.addWebviewEvent('dom-ready', this.handleScroll)
+
     }
   },
   watch: {
@@ -132,18 +151,7 @@ export default {
       if (this.currentBook !== -1) {
         
         setTimeout(() => {
-          this.$electron.ipcRenderer.send('current-book', this.currentBook)
-          const book = this.books[this.currentBook]
-          this.url = book.urls[book.urlindex].url
-          this.title = book.title
-          this.webview = document.querySelector('webview')
-          this.webview.clearHistory()
-          
-          this.addWebviewEvent('ipc-message', this.handleMessage)  
-          this.addWebviewEvent('did-navigate', this.didNavigate)
-          this.addWebviewEvent('did-navigate-in-page', this.didNavigate)
-          this.addWebviewEvent('dom-ready', this.handleScroll)
-          this.addEvent('scroll', this.updateScroll)
+          this.bootstrap()
 
         }, 200)  
       }
@@ -182,13 +190,9 @@ export default {
     })
   },
   mounted() {
-    const book = this.books[this.currentBook]
-    if (!book) return
-    this.url = book.urls[book.urlindex].url
-    this.title = book.title
     setTimeout(() => {
-      this.handleScroll()
-    },200)
+      this.bootstrap()
+    })
     dictionary = new Dictionary(this.$store.state.library.settings)
   }
 };
