@@ -20,3 +20,7 @@ hbook aims to provide a way to read online static html books with some of the fa
 # limitations
 
 * scroll position is dependent on app size so works best if you don't change from the default size.
+
+# demo video
+
+https://youtu.be/zEg-Peq3hwA
