@@ -17,7 +17,7 @@ CREATE TABLE url (
   id INTEGER PRIMARY KEY,
   source_id INTEGER,
   url TEXT,
-  scroll INTEGER.
+  scroll INTEGER,
   maxscroll INTEGER
 );
 
@@ -37,6 +37,12 @@ CREATE TABLE tag (
 CREATE TABLE tag_ref (
   tag_id INTEGER,
   bookmark_id INTEGER
+);
+
+CREATE TABLE language (
+  source_id INTEGER,
+  source_type INTEGER,
+  label TEXT
 );
 
 CREATE INDEX idx_url_source_id ON url (source_id);
