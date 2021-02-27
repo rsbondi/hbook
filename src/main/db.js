@@ -42,15 +42,15 @@ class DataBase {
   }
 
   getGlobalLanguage() {
-    return this.getLanguage('NULL', DB_LANG_TYPE.GLOBAL)
+    return this.getLanguage(-1, DB_LANG_TYPE.GLOBAL)
   }
 
   getLanguage(sourceId, sourceType) {
     return new Promise(async (resolve, reject) => {
       try {
         const src = sourceId==='NULL' ? ' IS NULL' : `=${sourceId}`
-        const query = `SELECT * FROM language WHERE source_id${src} AND source_type=${sourceType}`
-        const source = await this.queryAsync(query)
+        const query = `SELECT * FROM language WHERE source_id=? AND source_type=?`
+        const source = await this.queryAsync(query, sourceId, sourceType)
         resolve(source)
       } catch (err) {
         console.error(err.message)
@@ -60,26 +60,99 @@ class DataBase {
   }
 
   setGlobalLanguage(lang) {
-    return this.setLanguage('NULL', DB_LANG_TYPE.GLOBAL, lang)
+    return this.setLanguage(-1, DB_LANG_TYPE.GLOBAL, lang)
   }
 
   setLanguage(sourceId, sourceType, lang) {
     return new Promise(async (resolve, reject) => {
       try {
-        const source = await this.getGlobalLanguage()
-        let query
+        const source = await this.getLanguage(sourceId, sourceType)
+        let query, params
         if (source.length) {
-          query = `UPDATE language SET label='${lang}' WHERE source_type=${sourceType} AND source_id=${sourceId}`
+          query = `UPDATE language SET label=? WHERE source_type=? AND source_id=?`
+          params = [lang, sourceType, sourceId]
         } else {
-          query = `INSERT INTO language VALUES (${sourceId}, ${sourceType}, '${lang}')`
+          query = `INSERT INTO language (source_id, source_type, label) VALUES (?, ?, ?)`
+          params = [sourceId, sourceType, lang]
         }
-        await this.runAsync(query)
+        await this.runAsync(query, ...params)
         resolve()
       } catch (err) {
         console.error(err.message)
         reject(err)
       }
     })
+  }
+
+  setCollection(title, id) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let query, params
+        if (id) {
+          query = `UPDATE collection SET title=? WHERE id=?`
+          params = [title, id]
+        } else {
+          query = `INSERT INTO collection (title) VALUES (?)`
+          params = [title]
+        }
+        const insert = await this.runAsync(query, ...params)
+        resolve({ id: insert && insert.lastID || -1})
+
+      } catch(err) {
+        reject(err)
+      }
+    })
+  }
+
+  addUrl(sourceId, url) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const insert = await this.runAsync(`INSERT INTO url (source_id, url, scroll, maxscroll) VALUES(?, ?, 0, 0)`, sourceId, url)
+        resolve({ id: insert && insert.lastID || -1})
+      } catch(err) {
+        reject(err)
+      }
+    })
+  }
+
+  updateUrl(id, scroll, maxscroll) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const insert = await this.runAsync(`UPDATE url SET scroll=?, maxscroll=COALESCE(?, 0) WHERE id=?`, scroll, maxscroll, id)
+        resolve()
+      } catch(err) {
+        reject(err)
+      }
+    })
+  }
+
+  addSource(collection, title, url) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await this.runAsync('BEGIN TRANSACTION;')
+        const insertSource = await this.runAsync(`INSERT INTO source (collection_id, title) VALUES(?, ?)`, collection, title)
+        const sourceId = insertSource.lastID
+        const urlInsert = await this.addUrl(sourceId, url)
+        const urlId = urlInsert.id
+        await this.runAsync(`UPDATE source SET urlindex=? WHERE id=?`, urlId, sourceId)
+        await this.runAsync('COMMIT;')
+        resolve({sourceId, urlId})
+      } catch(err) {
+        await this.runAsync('ROLLBACK;')
+        reject(err)
+      }
+    })
+  }
+
+  updateSource(id, urlindex) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const insert = await this.runAsync(`UPDATE source SET urlindex=? WHERE id=?`, urlindex, id)
+        resolve()
+      } catch(err) {
+        reject(err)
+      }
+    })    
   }
 
   queryAsync(statement, ...params) {
