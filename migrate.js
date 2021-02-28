@@ -31,6 +31,9 @@ async function migrate(books, settings) {
   for (var b=0; b<books.length; b++) {
     const book = books[b]
     let {sourceId, urlId} = await db.addSource(collection.id, book.title, book.urls[0].url)
+    if (book.lang) {
+      db.updateSource(sourceId, {lang:book.lang})
+    }
     for (var u=0; u<book.urls.length; u++) {
       const url = book.urls[u]
       if (u !== 0) {
