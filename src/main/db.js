@@ -178,6 +178,46 @@ class DataBase {
     })    
   }
 
+  getCollections() {
+    const query =
+  `
+  SELECT * FROM (
+    SELECT 
+      c.id collection_id, c.title collection_title,
+      s.id source_id, s.title source_title, s.urlindex,
+      u.id url_id, u.url, u.scroll, u.maxscroll,
+      NULL bookmark_id, NULL bookmark_url, NULL bookmark_url_id, NULL phrase, NULL note
+    FROM  collection c
+    JOIN source s ON s.collection_id=c.id
+    JOIN url u on u.source_id=s.id
+  
+    UNION
+    SELECT 
+      c.id collection_id, c.title collection_title,
+      s.id source_id, s.title source_title, s.urlindex,
+      NULL url_id, NULL url, NULL scroll, NULL maxscroll,
+      b.id bookmark_id, u.url bookmark_url, b.url_id bookmark_url_id, b.phrase, b.note
+    FROM  collection c
+    JOIN source s ON s.collection_id=c.id
+    JOIN bookmark b ON b.source_id=s.id
+    JOIN url u on b.url_id=u.id
+  
+  )
+  ORDER BY collection_id, source_id, url_id, bookmark_id
+  ;
+  `
+  return new Promise(async (resolve, reject) => {
+    try {
+      const rows = await this.queryAsync(query)
+      console.log('everything', rows)
+      resolve()
+    } catch(err) {
+      reject(err)
+    }
+  })
+
+  }
+
   queryAsync(statement, ...params) {
     return new Promise(async (resolve, reject) => {
       this.db.all(statement, params, function(err, rows) {

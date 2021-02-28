@@ -2,6 +2,8 @@ const ipc = require('electron').ipcMain
 const path = require('path')
 const os = require('os')
 const fs = require('fs')
+// const {db, DB_LANG_TYPE} = require('./db')
+
 let browserIPC, webcontentIPC
 
 const configFilename = path.join(os.homedir(), '.hbook')
@@ -17,6 +19,7 @@ try {
     books = info
     settings = { lang: 'en' }
   }
+  // db.getCollections()
 } catch (err) {
   books = []
   console.error(err)
