@@ -40,7 +40,7 @@ async function migrate(books, settings) {
       const {scroll, maxscroll} = url
       await db.updateUrl(urlId, scroll, maxscroll)
       if(u === book.urlindex) {
-        db.updateSource(sourceId, urlId)
+        db.updateSource(sourceId, {urlindex:urlId})
       }
     }
 

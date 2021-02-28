@@ -156,10 +156,21 @@ class DataBase {
     })
   }
 
-  updateSource(id, urlindex) {
+  updateSource(id, {urlindex, lang}) {
     return new Promise(async (resolve, reject) => {
       try {
-        const insert = await this.runAsync(`UPDATE source SET urlindex=? WHERE id=?`, urlindex, id)
+        const params = []
+        const sets = []
+        if (urlindex) {
+          sets.push('urlindex=?')
+          params.push(urlindex)
+        }
+        if (lang) {
+          sets.push('lang=?')
+          params.push(lang)
+        }
+        params.push(id)
+        const insert = await this.runAsync(`UPDATE source SET ${sets.join(', ')} WHERE id=?`, ...params)
         resolve()
       } catch(err) {
         reject(err)
