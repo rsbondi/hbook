@@ -34,7 +34,7 @@ try {
 
 function saveBooks() {
   try {
-    fs.writeFile(configFilename, JSON.stringify({ library: books, settings }), err => {
+    fs.writeFile(configFilename, JSON.stringify({ library: books, settings, collections, tags }), err => {
       if (err) {
         console.log(err);
       }
@@ -55,7 +55,8 @@ ipc.on('add-book',  (event, args) => {
         scroll: 0
       }
     ],
-    urlindex: 0
+    urlindex: 0,
+    collection: args.collection
   }
   books.push(book)
   event.sender.send('book-added', book)

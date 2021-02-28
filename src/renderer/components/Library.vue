@@ -10,20 +10,19 @@
 
       <div class="lib-wrapper">
         <h2>Library</h2>
-        <ul>
-          <li v-for="(book,i) in books" :key="i">
-            <div class="book">
-              <div class="title" @click="bookSelected(i)">
-                {{book.title}}
-              </div>
-              <button class="trash" @click="removeBook(i)">x</button>
-            </div>
-          </li>
-        </ul>
+        <div v-for="collection in collections" :key="collection.id">
+          <CollectiionList :collection="collection"/>
+        </div>
+
         <button @click="showBookForm=!showBookForm">+</button>
         <div class="book-form" v-if="showBookForm">
           <input v-model="title" type="text" placeholder="title">
           <input v-model="url" type="text" placeholder="url">
+          <label>collection:</label> <select v-model="collection">
+            <option v-for="collection in collections" :key="collection.id" :value="collection.id">
+              {{collection.title}}
+            </option>
+          </select>
           <button @click="addBook">Add Book</button>
         </div>
       </div>
@@ -34,24 +33,18 @@
 <script>
 import EventMixin from '../eventMixin'
 import Settings from './Settings.vue'
+import CollectiionList from './CollectionList'
 
 export default {
   name: 'library',
   mixins: [ EventMixin ],
-  components: { Settings },
+  components: { Settings, CollectiionList },
   methods: {
-    bookSelected(index) {
-      this.$store.dispatch('set_current_book', index)
-      this.$router.push('/read')
-    },
-    addBook() {
+     addBook() {
       if (this.title !== "" && this.url !== "")
-        this.$electron.ipcRenderer.send("add-book", { title: this.title, url: this.url });  
+        this.$electron.ipcRenderer.send("add-book", { title: this.title, url: this.url, collection: this.collection })
         this.title = ""
         this.url = ""    
-    },
-    removeBook(index) {
-      this.$electron.ipcRenderer.send("remove-book", index);
     },
     sendLibraryEvent(e, arg) {
       this.$store.dispatch('set_books', { collections: arg.collections, books: arg.books, settings: arg.settings })
@@ -75,6 +68,9 @@ export default {
     this.addEvent("book-removed", this.bookRemovedEvent)
   },
   computed: {
+    collections() {
+      return this.$store.getters.collectionLib
+    },
     books() {
       return this.$store.state.library.books
     },
@@ -87,6 +83,7 @@ export default {
       showBookForm: false,
       title: "",
       url: "",
+      collection: 1,
       showSettings: false,
     }
   },
@@ -94,16 +91,6 @@ export default {
 </script>
 
 <style>
-  .book {
-    cursor: pointer;
-    color: #28f;
-    padding: 0.15em 0;
-    display: flex;
-  }
-
-  li {
-    list-style: none;
-  }
 
   .book-form input {
     width: 100%;
