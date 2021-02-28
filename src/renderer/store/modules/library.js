@@ -1,12 +1,14 @@
 const state = {
   currentBook: -1,
   books: [],
+  collections: [],
   settings: {},
   preload: ""
 }
 
 const mutations = {
   set_books (state, payload) {
+    state.collections = payload.collections,
     state.books = payload.books,
     state.settings = payload.settings
   },
@@ -105,6 +107,20 @@ const actions = {
 const getters = {
   book: state => {
     return state.books[state.currentBook]
+  },
+  collectionLib: state => {
+    const collectionLib = state.collections.reduce((lib, col) => {
+      lib.push({...col, books: []})
+      return lib
+    },[])
+    state.books.forEach(book => {
+      if (!book.collection) {
+        book.collection = 1
+      }
+      const col = collectionLib.find(c => c.id === book.collection)
+      col && col.books.push(book)
+    })
+    return collectionLib
   }
 }
 

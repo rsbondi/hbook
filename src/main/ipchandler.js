@@ -2,12 +2,11 @@ const ipc = require('electron').ipcMain
 const path = require('path')
 const os = require('os')
 const fs = require('fs')
-// const {db, DB_LANG_TYPE} = require('./db')
 
 let browserIPC, webcontentIPC
 
 const configFilename = path.join(os.homedir(), '.hbook')
-let books, settings
+let books, settings, collections, tags
 
 try {
   const data = fs.readFileSync(configFilename, 'utf8')
@@ -15,17 +14,23 @@ try {
   if (info.library) {
     books = info.library
     settings = info.settings
+    if (info.collections) {
+      collections = info.collections
+      tags = info.tags
+    } else {
+      collections = [
+        {id: 1, title: "default"}
+      ]
+      tags = []
+    }
   } else {
     books = info
     settings = { lang: 'en' }
   }
-  // db.getCollections()
 } catch (err) {
   books = []
   console.error(err)
 }
-
-console.log('books initialized', books)
 
 function saveBooks() {
   try {
@@ -78,6 +83,7 @@ ipc.on('scroll',  (event, arg) => {
 ipc.on('get-library', (event, arg) => {
   browserIPC = event.sender
   event.sender.send('send-library', {
+    collections,
     books,
     settings,
     preload: 'file://'+path.resolve(path.join(__static, 'preload.js'))
