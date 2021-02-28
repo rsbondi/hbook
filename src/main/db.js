@@ -115,6 +115,18 @@ class DataBase {
     })
   }
 
+  addBookmark(sourceId, phrase, note, urlId, scroll) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const query = `INSERT INTO bookmark (source_id, phrase, note, url_id, scroll) VALUES(?, ?, ?, ?, ?)`
+        const insert = await this.runAsync(query, sourceId, phrase, note, urlId, scroll)
+        resolve({ id: insert && insert.lastID || -1})
+      } catch(err) {
+        reject(err)
+      }
+    })
+  }
+
   updateUrl(id, scroll, maxscroll) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -166,11 +178,9 @@ class DataBase {
 
   runAsync(statement, ...params) {
     return new Promise(async (resolve, reject) => {
-      console.log(`running query async: ${statement}`)
       this.db.run(statement, params, function(err) {
         if (err) reject(err)
         else {
-          console.log(`resolving statement: ${statement}`)
           resolve(this)
         }
       })

@@ -43,6 +43,15 @@ async function migrate(books, settings) {
         db.updateSource(sourceId, urlId)
       }
     }
+
+    if (book.bookmarks) {
+      for (var m=0; m<book.bookmarks.length; m++) {
+        const bm = book.bookmarks[m]
+        const query = `SELECT id FROM url WHERE url=?`
+        const bmUrl = await db.queryAsync(query, bm.url)
+        await db.addBookmark(sourceId, bm.phrase, bm.note, bmUrl[0].id, bm.scroll)
+      }
+    }
   }
 
   console.log('done creating db')

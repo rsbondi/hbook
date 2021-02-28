@@ -26,6 +26,7 @@ CREATE TABLE bookmark (
   url_id INTEGER,
   source_id INTEGER,
   phrase TEXT,
+  note TEXT,
   scroll INTEGER
 );
 
