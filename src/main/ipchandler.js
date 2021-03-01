@@ -64,6 +64,16 @@ ipc.on('add-book',  (event, args) => {
   saveBooks()
 })
 
+ipc.on('add-collection', (event, args) => {
+  const collection = {
+    id: collections.reduce((m, c) => Math.max(m, c.id), 0) + 1,
+    title: args
+  }
+  collections.push(collection)
+  console.log('add-collection', JSON.stringify(collections))
+  saveBooks()
+})
+
 ipc.on('remove-book', (event, args) => {
   books.splice(args, 1)
   console.log('remove-book', args)

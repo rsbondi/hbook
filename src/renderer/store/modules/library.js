@@ -68,7 +68,14 @@ const mutations = {
     } else {
       state.books[state.currentBook].lang = payload.lang
     }
-  }
+  },
+  add_collection (state, payload) {
+    const collection = {
+      id: state.collections.reduce((m, c) => Math.max(m, c.id), 0) + 1,
+      title: payload
+    }
+    state.collections.push(collection)
+  },
 }
 
 const actions = {
@@ -83,6 +90,9 @@ const actions = {
   },
   add_book ({ commit }, payload) {
     commit('add_book', payload)
+  },
+  add_collection ({ commit }, payload) {
+    commit('add_collection', payload)
   },
   update_book ({ commit }, payload) {
     commit('update_book', payload)
