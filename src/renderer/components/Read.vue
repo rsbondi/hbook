@@ -69,17 +69,16 @@ export default {
       let scroll = 0
       if (urlindex > -1) {
         scroll = book.urls[urlindex].scroll
-      } else urlindex = book.urls.length // new, not registered yet
+        this.$store.dispatch('update_book_url_index', urlindex)
+        this.$electron.ipcRenderer.send("update-book-url-index", urlindex);
+      }
 
       const payload = {index: this.currentBook, key:'url', value: {
         url: event.url,
         scroll
       }}
       this.$store.dispatch('update_book', payload)
-      this.$store.dispatch('update_book_url_index', urlindex)
-
       this.$electron.ipcRenderer.send("update-book", payload);
-      this.$electron.ipcRenderer.send("update-book-url-index", urlindex);
       this.url = event.url
       this.$store.dispatch('set_scroll', scroll)
 
