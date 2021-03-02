@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="collection.books.length">
     <h5 @click="toggleCollection" class="collection-title">{{collection.title}}</h5>
     <ul v-show="showCollection">
       <li v-for="(book,i) in collection.books" :key="i">
@@ -26,7 +26,7 @@ export default {
   },
   methods: {
     bookSelected(index) {
-      this.$store.dispatch('set_current_book', index)
+      this.$store.dispatch('set_current_book', {index, collection: this.collection.id})
       this.$router.push('/read')
     },
     removeBook(index) {

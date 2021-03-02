@@ -45,6 +45,7 @@ function saveBooks() {
 }
 
 let currentBook = 0
+let currentCollection = 1
 
 ipc.on('add-book',  (event, args) => {
   const book = {
@@ -131,8 +132,9 @@ ipc.on('update-book-url-index', (event, args) => {
 })
 
 ipc.on('current-book', (event, args) => {
-  console.log('current-book', args)
-  currentBook = args
+  console.log('current-book', args.book)
+  currentCollection = args.collection
+  currentBook = args.book
 })
 
 ipc.on('add-bookmark', (event, args) => {

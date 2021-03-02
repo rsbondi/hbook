@@ -65,11 +65,12 @@ export default {
     didNavigate(event) {
       if (event.url === "about:blank") return
       const book = this.books[this.currentBook]
-      const urlindex = book.urls.map(item => item.url).indexOf(event.url)
+      let urlindex = book.urls.map(item => item.url).indexOf(event.url)
       let scroll = 0
       if (urlindex > -1) {
         scroll = book.urls[urlindex].scroll
-      }
+      } else urlindex = book.urls.length // new, not registered yet
+
       const payload = {index: this.currentBook, key:'url', value: {
         url: event.url,
         scroll
@@ -136,7 +137,7 @@ export default {
       this.$store.dispatch('set_scroll', scroll)
     },
     bootstrap() {
-      this.$electron.ipcRenderer.send('current-book', this.currentBook)
+      this.$electron.ipcRenderer.send('current-book', {book: this.currentBook, collection: this.currentCollection})
       const book = this.books[this.currentBook]
       if (!book) return
       this.url = book.urls[book.urlindex].url
@@ -162,7 +163,7 @@ export default {
         setTimeout(() => {
           this.bootstrap()
 
-        }, 200)  
+        }, 0)  
       }
     }
   },
@@ -181,7 +182,17 @@ export default {
   },
   computed: {
     currentBook() {
-      return this.$store.state.library.currentBook
+      const currentCollection = this.$store.state.library.currentCollection
+      const collection = this.$store.getters.collectionLib.find(c => c.id === currentCollection)
+      if(!collection) return -1
+      const book = collection.books[this.$store.state.library.currentBook]
+      const bookInBooks = this.books.find(b => b.title === book.title && b.collection === currentCollection)
+      const index = this.books.indexOf(bookInBooks)
+
+      return index
+    },
+    currentCollection() {
+      return this.$store.state.library.currentCollection
     },
     books() {
       return this.$store.state.library.books
