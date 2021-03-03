@@ -161,6 +161,13 @@ ipc.on('setscroll', (event, arg) => {
     webcontentIPC.send('setscroll', arg)
 })
 
+ipc.on('set-collection-expanded', (event, arg) => {
+  console.log('set-collection-expanded', arg)
+  const collection = collections.find(c => c.id === arg.id)
+  collection.expanded = arg.expanded
+  saveBooks()
+})
+
 ipc.on('webview-loaded', (event, arg) => {
   webcontentIPC = event.sender
 })

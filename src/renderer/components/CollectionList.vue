@@ -21,7 +21,9 @@ export default {
   },
   data() {
     return {
-      showCollection: this.collection.id === 1
+      showCollection: this.collection.id === 1 || 
+        this.$store.state.library.collections.find(c => c.id === this.collection.id).expanded
+
     }
   },
   methods: {
@@ -34,6 +36,8 @@ export default {
     },
     toggleCollection() {
       this.showCollection = !this.showCollection
+      this.$store.dispatch('set_collection_expanded', {id: this.collection.id, expanded: this.showCollection})
+      this.$electron.ipcRenderer.send("set-collection-expanded", {id: this.collection.id, expanded: this.showCollection});
     }
   }
 }

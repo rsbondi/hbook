@@ -78,6 +78,11 @@ const mutations = {
     }
     state.collections.push(collection)
   },
+  set_collection_expanded (state, payload) {
+    console.log('set expand', payload)
+    const collection = state.collections.find(c => c.id === payload.id)
+    collection.expanded = payload.expanded
+  }
 }
 
 const actions = {
@@ -113,6 +118,9 @@ const actions = {
   },
   update_book_url_index ({ commit }, payload) {
     commit('update_book_url_index', payload)
+  },
+  set_collection_expanded ({ commit }, payload) {
+    commit('set_collection_expanded', payload)
   }
 }
 
