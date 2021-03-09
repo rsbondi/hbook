@@ -1,5 +1,7 @@
 # hbook
 
+This project has been ported [here](https://codeberg.org/rsbondi/ratod) so this repo will no longer be updated.
+
 ## intro
 
 The original intention was to provide a way to read online static html books with some of the familiar features of an ebook reader.  There are many good books deployed as static html, gitbook or even books developed on github.  They can be difficult to read in this format, you can easily lose track of where you left off.  hbook will keep track for you across multiple books.  A web browser is limited by bookmarking only the page url without any means of saving or annotating passages, which are features of hbook.
